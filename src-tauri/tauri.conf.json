@@ -23,6 +23,12 @@
       "csp": null
     }
   },
+  "plugins": {
+    "sql": {
+      "allowExecute": true,
+      "features": ["sqlite"]
+    }
+  },
   "bundle": {
     "active": true,
     "targets": "all",
