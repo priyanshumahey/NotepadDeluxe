@@ -13,24 +13,12 @@ const data = {
       url: '/notes',
       icon: BookOpen,
       isActive: true,
-      items: [
-        {
-          title: 'All Notes',
-          url: '/notes',
-        },
-      ],
     },
     {
       title: 'New Note',
       url: '/newnote',
       icon: PenSquare,
       isActive: true,
-      items: [
-        {
-          title: 'Create New Note',
-          url: '/newnote',
-        },
-      ],
     },
   ],
 };

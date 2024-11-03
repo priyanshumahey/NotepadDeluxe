@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   BoldPlugin,
   CodePlugin,
@@ -22,10 +23,8 @@ import { IndentListToolbarButton } from './indent-list-toolbar-button';
 import { IndentTodoToolbarButton } from './indent-todo-toolbar-button';
 import { InsertDropdownMenu } from './insert-dropdown-menu';
 import { LineHeightDropdownMenu } from './line-height-dropdown-menu';
-import { LinkToolbarButton } from './link-toolbar-button';
 import { MarkToolbarButton } from './mark-toolbar-button';
 import { MediaToolbarButton } from './media-toolbar-button';
-import { ModeDropdownMenu } from './mode-dropdown-menu';
 import { MoreDropdownMenu } from './more-dropdown-menu';
 import { TableDropdownMenu } from './table-dropdown-menu';
 import { ToggleToolbarButton } from './toggle-toolbar-button';
@@ -38,9 +37,8 @@ export function FixedToolbarButtons() {
   return (
     <div className="w-full">
       <div
-        className="flex"
+        className="flex flex-wrap"
         style={{
-          // Conceal the first separator on each line using overflow
           transform: 'translateX(calc(-1px))',
         }}
       >
@@ -48,7 +46,6 @@ export function FixedToolbarButtons() {
           <>
             <ToolbarGroup>
               <InsertDropdownMenu />
-
               <TurnIntoDropdownMenu />
             </ToolbarGroup>
 
@@ -99,35 +96,23 @@ export function FixedToolbarButtons() {
 
             <ToolbarGroup>
               <AlignDropdownMenu />
-
               <LineHeightDropdownMenu />
-
               <IndentListToolbarButton nodeType={ListStyleType.Disc} />
               <IndentListToolbarButton nodeType={ListStyleType.Decimal} />
               <IndentTodoToolbarButton />
             </ToolbarGroup>
 
             <ToolbarGroup>
-              <LinkToolbarButton />
-
               <ToggleToolbarButton />
-
               <MediaToolbarButton nodeType={ImagePlugin.key} />
-
               <TableDropdownMenu />
-
               <EmojiDropdownMenu />
-
               <MoreDropdownMenu />
             </ToolbarGroup>
           </>
         )}
 
         <div className="grow" />
-
-        <ToolbarGroup>
-          <ModeDropdownMenu />
-        </ToolbarGroup>
       </div>
     </div>
   );

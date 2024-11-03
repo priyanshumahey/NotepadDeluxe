@@ -1,28 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { BookOpen, PenSquare } from 'lucide-react';
 
-export default function IndexPage() {
-  const [notes, setNotes] = useState<any[]>([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      if (typeof window !== 'undefined') {
-        // Dynamically import Tauri functions on the client side
-        const { initializeDatabase, getNotes } = await import(
-          '@/lib/tauriDatabase'
-        );
-        const db = await initializeDatabase();
-        const allNotes = await getNotes(db);
-        setNotes(allNotes);
-      }
-    };
-
-    fetchData();
-  }, []);
-
+export default function HomePage() {
   return (
     <section className="container mx-auto max-w-4xl px-4 py-16">
       <div className="space-y-6 text-center">
@@ -50,34 +31,6 @@ export default function IndexPage() {
           <span>All Notes</span>
         </Link>
       </div>
-
-      <div className="mt-12">
-        <h2 className="text-2xl font-bold text-gray-900">Your Notes</h2>
-        <ul className="mt-4 space-y-4">
-          {notes.map((note, index) => (
-            <li key={index} className="rounded-lg border p-4 shadow-sm">
-              <h3 className="text-xl font-semibold">{note.title}</h3>
-              <p className="mt-2 text-gray-700">{note.content.text}</p>
-            </li>
-          ))}
-        </ul>
-      </div>
-      {/* Delete all the notes */}
-      <button
-        onClick={async () => {
-          if (typeof window !== 'undefined') {
-            const { initializeDatabase, deleteAllNotes } = await import(
-              '@/lib/tauriDatabase'
-            );
-            const db = await initializeDatabase();
-            await deleteAllNotes(db);
-            setNotes([]);
-          }
-        }}
-        className="mt-6 rounded-lg bg-red-600 px-6 py-3 text-white shadow-lg transition-colors duration-200 hover:bg-red-700"
-      >
-        Delete All Notes
-      </button>
     </section>
   );
 }

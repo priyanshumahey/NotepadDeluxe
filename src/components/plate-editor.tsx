@@ -144,8 +144,8 @@ export default function PlateEditor({
     <DndProvider backend={HTML5Backend}>
       <Plate
         editor={editor}
-        onChange={(data) => {
-          setValue(data);
+        onChange={({ value }) => {
+          setValue(value);
         }}
       >
         <div

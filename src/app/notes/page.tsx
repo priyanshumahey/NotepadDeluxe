@@ -1,46 +1,117 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { initializeDatabase, getNotes } from '@/lib/tauriDatabase';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
+import NoteEditor from './NoteEditor';
 
-export default function NewNotePage() {
-  const [notes, setNotes] = useState([]);
+interface Note {
+  id: number;
+  name: string;
+  content: string;
+}
+
+function NotesPage() {
+  const [notes, setNotes] = useState<Note[]>([]);
+  const [selectedNote, setSelectedNote] = useState<Note | null>(null);
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
-    const fetchNotes = async () => {
-      const db = await initializeDatabase();
-      const allNotes = await getNotes(db);
-      setNotes(allNotes);
+    const fetchData = async () => {
+      if (typeof window === 'undefined') return;
+
+      try {
+        const { initializeDatabase, getNotes } = await import('@/lib/tauriDatabase');
+        const db = await initializeDatabase();
+        const allNotes = await getNotes(db);
+        setNotes(allNotes);
+
+        // Check if an ID is already in the URL and load the note
+        const noteId = searchParams.get('noteId');
+        if (noteId) {
+          const noteToLoad = allNotes.find((note) => note.id === Number(noteId));
+          if (noteToLoad) setSelectedNote(noteToLoad);
+        }
+      } catch (error) {
+        console.error('Failed to fetch notes:', error);
+      }
     };
 
-    fetchNotes();
-  }, []);
+    fetchData();
+  }, [searchParams]);
+
+  const handleNoteClick = (note: Note) => {
+    setSelectedNote(note);
+    router.replace(`/notes?noteId=${note.id}`);
+  };
+
+  const handleDeleteAllNotes = async () => {
+    if (typeof window === 'undefined') return;
+
+    try {
+      const { initializeDatabase, deleteAllNotes } = await import('@/lib/tauriDatabase');
+      const db = await initializeDatabase();
+      await deleteAllNotes(db);
+      setNotes([]);
+      setSelectedNote(null);
+      router.replace('/notes');
+    } catch (error) {
+      console.error('Failed to delete notes:', error);
+    }
+  };
 
   return (
-    <div className="container mx-auto max-w-4xl px-4 py-16">
-      <h1 className="text-2xl font-bold mb-6">All Notes</h1>
-      {notes.length === 0 ? (
-        <p>No notes available.</p>
+    <section className="container mx-auto max-w-4xl px-4 py-16">
+      <div className="mb-8">
+        <Button onClick={() => router.push('/')} className="inline-flex items-center gap-2">
+          <ArrowLeft className="size-4" />
+          <span>Back to Home</span>
+        </Button>
+      </div>
+
+      <h1 className="mb-8 text-3xl font-bold text-gray-900">All Notes</h1>
+
+      {selectedNote ? (
+        <NoteEditor note={selectedNote} />
       ) : (
-        <ul className="space-y-4">
-          {notes.map((note: {
-            time_updated: any; id: string; name: string; content: { text: string }; time_created: string 
-          }) => (
-            <li key={note.id} className="p-4 bg-gray-100 rounded-lg shadow">
-              <h2 className="text-xl font-semibold">{note.name}</h2>
-              <p className="text-gray-700">{note.content.text}</p>
-              <p className="text-sm text-gray-500">
-                Created: {new Date(note.time_created).toLocaleString()}
-              </p>
-              {note.time_updated && (
-                <p className="text-sm text-gray-500">
-                  Updated: {new Date(note.time_updated).toLocaleString()}
-                </p>
-              )}
-            </li>
-          ))}
-        </ul>
+        <div className="space-y-6">
+          {notes.length === 0 ? (
+            <p className="text-center text-gray-600">No notes yet. Create your first note!</p>
+          ) : (
+            <>
+              <ul className="space-y-4">
+                {notes.map((note) => (
+                  <li key={note.id} className="rounded-lg bg-gray-100 p-4 shadow">
+                    <button
+                      onClick={() => handleNoteClick(note)}
+                      className="block w-full text-left text-lg font-semibold text-blue-600 hover:underline"
+                    >
+                      {note.name}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+
+              <button
+                onClick={handleDeleteAllNotes}
+                className="mt-6 rounded-lg bg-red-600 px-6 py-3 text-white shadow-lg transition-colors duration-200 hover:bg-red-700"
+              >
+                Delete All Notes
+              </button>
+            </>
+          )}
+        </div>
       )}
-    </div>
+    </section>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <NotesPage />
+    </Suspense>
   );
 }
