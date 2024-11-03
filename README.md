@@ -1,32 +1,27 @@
-## Getting Started
+# Notepad Deluxe
 
-### Requirements
+## Introduction
 
-- Node.js
-- pnpm
+A simple note-taking app with a rich text editor and a database.
 
-### Environment Variables
+![Screenshot](./public/Homepage.png)
 
-Copy the example env file:
+![Screenshot](./public/NoteEdit.png)
 
-```bash
-cp .env.example .env.local
-```
+## Features
 
-Set up your environment variables:
+- Rich text editor with plugins for formatting text.
+- Database for storing notes.
+- Cross-platform (Windows, MacOS, Linux).
 
-- `OPENAI_API_KEY` – OpenAI API key ([get one here](https://platform.openai.com/account/api-keys))
+## Setup
 
-### Development
+1. Clone the repository.
+2. Install dependencies.
+	- Use npm install
+3. Run the app.
+	- Use npm tauri dev
 
-1. Install dependencies:
+## Implementation
 
-```bash
-pnpm install
-```
-
-2. Start the development server:
-
-```bash
-pnpm dev
-```
+This project was built using Tauri, Next.js, Shadcn/UI, Lucide Icons, Tailwind CSS and SQLite.

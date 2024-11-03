@@ -8,7 +8,7 @@ export default function HomePage() {
     <section className="container mx-auto max-w-4xl px-4 py-16">
       <div className="space-y-6 text-center">
         <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
-          Welcome to NotePad
+          Welcome to Notepad Deluxe
         </h1>
         <p className="text-lg text-gray-600">
           Your digital space for capturing thoughts and ideas
