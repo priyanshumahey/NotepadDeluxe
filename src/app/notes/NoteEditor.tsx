@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Save } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import PlateEditor from '@/components/plate-editor';
@@ -24,7 +25,9 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ note, onSave }) => {
     setIsSaving(true);
 
     try {
-      const { initializeDatabase, updateNote } = await import('@/lib/tauriDatabase');
+      const { initializeDatabase, updateNote } = await import(
+        '@/lib/tauriDatabase'
+      );
       const db = await initializeDatabase();
       await updateNote(db, note.id, title, JSON.stringify(value));
       onSave();
@@ -34,6 +37,32 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ note, onSave }) => {
       setIsSaving(false);
     }
   };
+
+  useEffect(() => {
+    const handleKeyDown = async (event: KeyboardEvent) => {
+      if (event.ctrlKey && event.key === 's') {
+        event.preventDefault();
+        setIsSaving(true);
+
+        try {
+          const { initializeDatabase, updateNote } = await import(
+            '@/lib/tauriDatabase'
+          );
+          const db = await initializeDatabase();
+          await updateNote(db, note.id, title, JSON.stringify(value));
+        } catch (error) {
+          console.error('Failed to update note:', error);
+        } finally {
+          setIsSaving(false);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [title, value]);
 
   return (
     <div className="space-y-4">

@@ -19,7 +19,7 @@ async function initializeDatabase() {
 
     return db;
   } catch (error) {
-    console.error("Failed to initialize database:", error);
+    console.error('Failed to initialize database:', error);
     throw error;
   }
 }
@@ -38,10 +38,10 @@ async function addNote(db, name, content) {
       name,
       content,
       time_created: timeCreated,
-      time_updated: timeCreated
+      time_updated: timeCreated,
     };
   } catch (error) {
-    console.error("Failed to add note:", error);
+    console.error('Failed to add note:', error);
     throw error;
   }
 }
@@ -56,7 +56,7 @@ async function updateNote(db, id, name, content) {
     );
     return result;
   } catch (error) {
-    console.error("Failed to update note:", error);
+    console.error('Failed to update note:', error);
     throw error;
   }
 }
@@ -67,10 +67,10 @@ async function getNotes(db) {
     const result = await db.select('SELECT * FROM notes');
     return result.map((note) => ({
       ...note,
-      content: JSON.parse(note.content) // Parse JSON content back into an object
+      content: JSON.parse(note.content), // Parse JSON content back into an object
     }));
   } catch (error) {
-    console.error("Failed to retrieve notes:", error);
+    console.error('Failed to retrieve notes:', error);
     throw error;
   }
 }
@@ -81,7 +81,7 @@ async function deleteNote(db, id) {
     const result = await db.execute('DELETE FROM notes WHERE id = $1', [id]);
     return result;
   } catch (error) {
-    console.error("Failed to delete note:", error);
+    console.error('Failed to delete note:', error);
     throw error;
   }
 }
@@ -92,7 +92,7 @@ async function deleteAllNotes(db) {
     await db.execute('DELETE FROM notes');
     console.log('All notes deleted from database');
   } catch (error) {
-    console.error("Failed to delete all notes:", error);
+    console.error('Failed to delete all notes:', error);
     throw error;
   }
 }
@@ -104,7 +104,7 @@ async function main() {
     const notes = await getNotes(db);
     console.log('Notes in database:', notes);
   } catch (error) {
-    console.error("Error in main function:", error);
+    console.error('Error in main function:', error);
   }
 }
 

@@ -1,16 +1,9 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
-import { ArrowLeft, Plus, Trash2, Save, MoreVertical } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from '@/components/ui/card';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,6 +15,15 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+
 import NoteEditor from './NoteEditor';
 
 interface Note {
@@ -42,14 +44,18 @@ function NotesPage() {
       if (typeof window === 'undefined') return;
 
       try {
-        const { initializeDatabase, getNotes } = await import('@/lib/tauriDatabase');
+        const { initializeDatabase, getNotes } = await import(
+          '@/lib/tauriDatabase'
+        );
         const db = await initializeDatabase();
         const allNotes = await getNotes(db);
         setNotes(allNotes);
 
         const noteId = searchParams.get('noteId');
         if (noteId) {
-          const noteToLoad = allNotes.find((note) => note.id === Number(noteId));
+          const noteToLoad = allNotes.find(
+            (note) => note.id === Number(noteId)
+          );
           if (noteToLoad) {
             setSelectedNote(noteToLoad);
             setIsEditing(true);
@@ -79,7 +85,9 @@ function NotesPage() {
     if (typeof window === 'undefined') return;
 
     try {
-      const { initializeDatabase, deleteAllNotes } = await import('@/lib/tauriDatabase');
+      const { initializeDatabase, deleteAllNotes } = await import(
+        '@/lib/tauriDatabase'
+      );
       const db = await initializeDatabase();
       await deleteAllNotes(db);
       setNotes([]);
@@ -95,7 +103,9 @@ function NotesPage() {
     if (typeof window === 'undefined') return;
 
     try {
-      const { initializeDatabase, addNote } = await import('@/lib/tauriDatabase');
+      const { initializeDatabase, addNote } = await import(
+        '@/lib/tauriDatabase'
+      );
       const db = await initializeDatabase();
       const newNote = await addNote(db, 'Untitled Note', '[]');
       setNotes([...notes, newNote]);
@@ -110,10 +120,12 @@ function NotesPage() {
     if (typeof window === 'undefined') return;
 
     try {
-      const { initializeDatabase, deleteNote } = await import('@/lib/tauriDatabase');
+      const { initializeDatabase, deleteNote } = await import(
+        '@/lib/tauriDatabase'
+      );
       const db = await initializeDatabase();
       await deleteNote(db, noteId);
-      setNotes(notes.filter(note => note.id !== noteId));
+      setNotes(notes.filter((note) => note.id !== noteId));
     } catch (error) {
       console.error('Failed to delete note:', error);
     }
@@ -122,7 +134,7 @@ function NotesPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <nav className="sticky top-0 z-10 border-b bg-white p-4 shadow-sm">
-        <div className="container mx-auto max-w-4xl flex items-center justify-between">
+        <div className="container mx-auto flex max-w-4xl items-center justify-between">
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
@@ -144,7 +156,10 @@ function NotesPage() {
             )}
           </div>
           {!isEditing && (
-            <Button onClick={handleCreateNewNote} className="inline-flex items-center gap-2">
+            <Button
+              onClick={handleCreateNewNote}
+              className="inline-flex items-center gap-2"
+            >
               <Plus className="size-4" />
               <span>New Note</span>
             </Button>
@@ -160,7 +175,9 @@ function NotesPage() {
               handleBackToNotes();
               // Refresh notes list after save
               const fetchNotes = async () => {
-                const { initializeDatabase, getNotes } = await import('@/lib/tauriDatabase');
+                const { initializeDatabase, getNotes } = await import(
+                  '@/lib/tauriDatabase'
+                );
                 const db = await initializeDatabase();
                 const allNotes = await getNotes(db);
                 setNotes(allNotes);
@@ -175,7 +192,10 @@ function NotesPage() {
               {notes.length > 0 && (
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button variant="destructive" className="inline-flex items-center gap-2">
+                    <Button
+                      variant="destructive"
+                      className="inline-flex items-center gap-2"
+                    >
                       <Trash2 className="size-4" />
                       <span>Delete All</span>
                     </Button>
@@ -184,12 +204,15 @@ function NotesPage() {
                     <AlertDialogHeader>
                       <AlertDialogTitle>Delete all notes?</AlertDialogTitle>
                       <AlertDialogDescription>
-                        This action cannot be undone. All your notes will be permanently deleted.
+                        This action cannot be undone. All your notes will be
+                        permanently deleted.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={handleDeleteAllNotes}>Delete All</AlertDialogAction>
+                      <AlertDialogAction onClick={handleDeleteAllNotes}>
+                        Delete All
+                      </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
@@ -200,7 +223,10 @@ function NotesPage() {
               <Card>
                 <CardContent className="flex min-h-[200px] flex-col items-center justify-center gap-4">
                   <CardDescription>No notes yet</CardDescription>
-                  <Button onClick={handleCreateNewNote} className="inline-flex items-center gap-2">
+                  <Button
+                    onClick={handleCreateNewNote}
+                    className="inline-flex items-center gap-2"
+                  >
                     <Plus className="size-4" />
                     <span>Create your first note</span>
                   </Button>
@@ -211,18 +237,18 @@ function NotesPage() {
                 {notes.map((note) => (
                   <Card
                     key={note.id}
-                    className="transition-all hover:shadow-md relative group"
+                    className="group relative transition-all hover:shadow-md"
                     role="button"
                     onClick={() => handleNoteClick(note)}
                   >
                     <CardHeader>
-                      <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="absolute right-2 top-2 opacity-0 transition-opacity group-hover:opacity-100">
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-8 w-8"
+                              className="size-8"
                               onClick={(e) => e.stopPropagation()}
                             >
                               <Trash2 className="size-4" />
@@ -232,21 +258,28 @@ function NotesPage() {
                             <AlertDialogHeader>
                               <AlertDialogTitle>Delete note?</AlertDialogTitle>
                               <AlertDialogDescription>
-                                This action cannot be undone. This note will be permanently deleted.
+                                This action cannot be undone. This note will be
+                                permanently deleted.
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
-                              <AlertDialogCancel onClick={(e) => e.stopPropagation()}>
+                              <AlertDialogCancel
+                                onClick={(e) => e.stopPropagation()}
+                              >
                                 Cancel
                               </AlertDialogCancel>
-                              <AlertDialogAction onClick={(e) => handleDeleteNote(note.id, e)}>
+                              <AlertDialogAction
+                                onClick={(e) => handleDeleteNote(note.id, e)}
+                              >
                                 Delete
                               </AlertDialogAction>
                             </AlertDialogFooter>
                           </AlertDialogContent>
                         </AlertDialog>
                       </div>
-                      <CardTitle className="line-clamp-2">{note.name}</CardTitle>
+                      <CardTitle className="line-clamp-2">
+                        {note.name}
+                      </CardTitle>
                       <CardDescription className="line-clamp-3">
                         {JSON.parse(note.content)
                           .map((block: any) => block.children?.[0]?.text || '')
