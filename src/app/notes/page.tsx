@@ -132,7 +132,7 @@ function NotesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       <nav className="sticky top-0 z-10 border-b bg-white p-4 shadow-sm">
         <div className="container mx-auto flex max-w-4xl items-center justify-between">
           <div className="flex items-center gap-4">
