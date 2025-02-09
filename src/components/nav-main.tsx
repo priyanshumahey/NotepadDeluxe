@@ -13,19 +13,20 @@ import {
 
 import type { LucideIcon } from 'lucide-react';
 
-export function NavMain({
-  items,
-}: {
+interface NavMainProps {
   items: {
     title: string;
     url: string;
     icon?: LucideIcon;
     isActive?: boolean;
   }[];
-}) {
+  hideLabel?: boolean;
+}
+
+export function NavMain({ items, hideLabel }: NavMainProps) {
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Menu</SidebarGroupLabel>
+      {!hideLabel && <SidebarGroupLabel>Menu</SidebarGroupLabel>}
       <SidebarMenu>
         {items.map((item) => (
           <Collapsible
