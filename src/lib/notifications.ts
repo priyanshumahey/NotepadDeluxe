@@ -4,19 +4,25 @@ import {
   sendNotification,
 } from '@tauri-apps/plugin-notification';
 
-// when using `"withGlobalTauri": true`, you may use
-// const { isPermissionGranted, requestPermission, sendNotification, } = window.__TAURI__.notification;
+// Function to check and request notification permission
+export async function checkAndRequestPermission(): Promise<boolean> {
+  let permissionGranted = await isPermissionGranted();
 
-// Do you have permission to send a notification?
-let permissionGranted = await isPermissionGranted();
+  if (!permissionGranted) {
+    const permission = await requestPermission();
+    permissionGranted = permission === 'granted';
+  }
 
-// If not we need to request it
-if (!permissionGranted) {
-  const permission = await requestPermission();
-  permissionGranted = permission === 'granted';
+  return permissionGranted;
 }
 
-// Once permission has been granted we can send the notification
-if (permissionGranted) {
-  sendNotification({ title: 'Tauri', body: 'Tauri is awesome!' });
+// Function to send a notification
+export async function notify(title: string, body: string): Promise<void> {
+  const permissionGranted = await checkAndRequestPermission();
+
+  if (permissionGranted) {
+    sendNotification({ title, body });
+  } else {
+    console.warn('Notification permission not granted');
+  }
 }

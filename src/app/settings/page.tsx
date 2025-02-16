@@ -1,7 +1,6 @@
 'use client';
 
-import { sendNotification } from '@tauri-apps/plugin-notification';
-
+import { notify } from '@/lib/notifications';
 import { Button } from '@/components/ui/button';
 
 export default function Page() {
@@ -9,12 +8,7 @@ export default function Page() {
     <div className="container mx-auto">
       <h1 className="m-4 text-3xl font-bold">Settings</h1>
       <Button
-        onClick={() =>
-          sendNotification({
-            title: 'Settings',
-            body: 'This is a test notification!',
-          })
-        }
+        onClick={() => notify('Settings', 'This is a test notification!')}
       >
         Notification Test
       </Button>
