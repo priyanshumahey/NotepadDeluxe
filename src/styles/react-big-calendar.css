@@ -174,7 +174,7 @@ button.rbc-input::-moz-focus-inner {
   font-size: 16px;
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 10;
   background-color: #fff;
   border-bottom: 1px solid #ddd;
 }

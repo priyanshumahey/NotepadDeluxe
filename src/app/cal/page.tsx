@@ -1,6 +1,7 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Trash2 } from 'lucide-react';
 import moment from 'moment';
 import { Calendar, Event, momentLocalizer, Views } from 'react-big-calendar';
@@ -19,10 +20,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 
-import './react-big-calendar.css';
-import './styles.css';
+// import { NoteHeatmap } from '@/components/note-heatmap';
 
-import { ScrollArea } from '@/components/ui/scroll-area';
+import '@/styles/react-big-calendar.css';
+import '@/styles/styles.css';
 
 interface CalendarEvent extends Event {
   id: string;
@@ -30,6 +31,9 @@ interface CalendarEvent extends Event {
   description?: string;
   start: Date;
   end: Date;
+  noteId?: number;
+  noteName?: string;
+  noteContent?: any;
 }
 
 interface EventFormData {
@@ -37,22 +41,15 @@ interface EventFormData {
   description: string;
   start: Date;
   end: Date;
+  noteId?: number;
 }
 
 const localizer = momentLocalizer(moment);
 const DnDCalendar = withDragAndDrop(Calendar);
 
 export default function MyCalendar() {
-  const [events, setEvents] = useState<CalendarEvent[]>([
-    {
-      id: '1',
-      title: 'Sample Event',
-      description: 'This is a sample event',
-      start: moment().toDate(),
-      end: moment().add(1, 'hours').toDate(),
-    },
-  ]);
-
+  const router = useRouter();
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isViewOpen, setIsViewOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -66,8 +63,38 @@ export default function MyCalendar() {
     end: new Date(),
   });
 
+  // Fetch events from database
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const { initializeDatabase, getEvents } = await import(
+          '@/lib/tauriDatabase'
+        );
+        const db = await initializeDatabase();
+
+        // Fetch events
+        const dbEvents = await getEvents(db);
+        const calendarEvents = dbEvents.map((event) => ({
+          id: event.id.toString(),
+          title: event.title,
+          description: event.description,
+          start: new Date(event.start_time),
+          end: new Date(event.end_time),
+          noteId: event.note_id,
+          noteName: event.note_name,
+          noteContent: event.note_content,
+        }));
+        setEvents(calendarEvents);
+      } catch (error) {
+        console.error('Failed to fetch data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   const handleEventDrop = useCallback(
-    ({
+    async ({
       event,
       start,
       end,
@@ -76,19 +103,37 @@ export default function MyCalendar() {
       start: Date;
       end: Date;
     }) => {
-      setEvents((prev) => {
-        const idx = prev.findIndex((e) => e.id === event.id);
-        const updatedEvent = { ...event, start, end };
-        const nextEvents = [...prev];
-        nextEvents.splice(idx, 1, updatedEvent);
-        return nextEvents;
-      });
+      try {
+        const { initializeDatabase, updateEvent } = await import(
+          '@/lib/tauriDatabase'
+        );
+        const db = await initializeDatabase();
+        await updateEvent(
+          db,
+          parseInt(event.id),
+          event.title,
+          event.description || null,
+          start.toISOString(),
+          end.toISOString(),
+          event.noteId || null
+        );
+
+        setEvents((prev) => {
+          const idx = prev.findIndex((e) => e.id === event.id);
+          const updatedEvent = { ...event, start, end };
+          const nextEvents = [...prev];
+          nextEvents.splice(idx, 1, updatedEvent);
+          return nextEvents;
+        });
+      } catch (error) {
+        console.error('Failed to update event:', error);
+      }
     },
     []
   );
 
   const handleEventResize = useCallback(
-    ({
+    async ({
       event,
       start,
       end,
@@ -97,13 +142,31 @@ export default function MyCalendar() {
       start: Date;
       end: Date;
     }) => {
-      setEvents((prev) => {
-        const idx = prev.findIndex((e) => e.id === event.id);
-        const updatedEvent = { ...event, start, end };
-        const nextEvents = [...prev];
-        nextEvents.splice(idx, 1, updatedEvent);
-        return nextEvents;
-      });
+      try {
+        const { initializeDatabase, updateEvent } = await import(
+          '@/lib/tauriDatabase'
+        );
+        const db = await initializeDatabase();
+        await updateEvent(
+          db,
+          parseInt(event.id),
+          event.title,
+          event.description || null,
+          start.toISOString(),
+          end.toISOString(),
+          event.noteId || null
+        );
+
+        setEvents((prev) => {
+          const idx = prev.findIndex((e) => e.id === event.id);
+          const updatedEvent = { ...event, start, end };
+          const nextEvents = [...prev];
+          nextEvents.splice(idx, 1, updatedEvent);
+          return nextEvents;
+        });
+      } catch (error) {
+        console.error('Failed to update event:', error);
+      }
     },
     []
   );
@@ -128,59 +191,114 @@ export default function MyCalendar() {
       description: event.description || '',
       start: event.start,
       end: event.end,
+      noteId: event.noteId,
     });
     setIsViewOpen(true);
   }, []);
 
-  const handleCreateEvent = useCallback(() => {
+  const handleCreateEvent = useCallback(async () => {
     if (newEvent.title.trim()) {
-      setEvents((prev) => [
-        ...prev,
-        {
-          id: Date.now().toString(),
-          ...newEvent,
-        },
-      ]);
-      setIsCreateOpen(false);
-      setNewEvent({
-        title: '',
-        description: '',
-        start: new Date(),
-        end: new Date(),
-      });
+      try {
+        const { initializeDatabase, addEvent } = await import(
+          '@/lib/tauriDatabase'
+        );
+        const db = await initializeDatabase();
+        const result = await addEvent(
+          db,
+          newEvent.title,
+          newEvent.description || null,
+          newEvent.start.toISOString(),
+          newEvent.end.toISOString(),
+          null
+        );
+
+        const createdEvent: CalendarEvent = {
+          id: result.id.toString(),
+          title: result.title,
+          description: result.description || '',
+          start: new Date(result.start_time),
+          end: new Date(result.end_time),
+        };
+
+        setEvents((prev) => [...prev, createdEvent]);
+        setIsCreateOpen(false);
+        setNewEvent({
+          title: '',
+          description: '',
+          start: new Date(),
+          end: new Date(),
+        });
+      } catch (error) {
+        console.error('Failed to create event:', error);
+      }
     }
   }, [newEvent]);
 
-  const handleUpdateEvent = useCallback(() => {
+  const handleUpdateEvent = useCallback(async () => {
     if (selectedEvent && newEvent.title.trim()) {
-      setEvents((prev) =>
-        prev.map((event) =>
-          event.id === selectedEvent.id
-            ? {
-                ...event,
-                title: newEvent.title,
-                description: newEvent.description,
-                start: newEvent.start,
-                end: newEvent.end,
-              }
-            : event
-        )
-      );
-      setIsViewOpen(false);
-      setIsEditing(false);
-      setSelectedEvent(null);
+      try {
+        const { initializeDatabase, updateEvent } = await import(
+          '@/lib/tauriDatabase'
+        );
+        const db = await initializeDatabase();
+        await updateEvent(
+          db,
+          parseInt(selectedEvent.id),
+          newEvent.title,
+          newEvent.description || null,
+          newEvent.start.toISOString(),
+          newEvent.end.toISOString(),
+          newEvent.noteId || null
+        );
+
+        setEvents((prev) =>
+          prev.map((event) =>
+            event.id === selectedEvent.id
+              ? {
+                  ...event,
+                  title: newEvent.title,
+                  description: newEvent.description,
+                  start: newEvent.start,
+                  end: newEvent.end,
+                }
+              : event
+          )
+        );
+        setIsViewOpen(false);
+        setIsEditing(false);
+        setSelectedEvent(null);
+      } catch (error) {
+        console.error('Failed to update event:', error);
+      }
     }
   }, [selectedEvent, newEvent]);
 
-  const handleDeleteEvent = useCallback(() => {
+  const handleDeleteEvent = useCallback(async () => {
     if (selectedEvent) {
-      setEvents((prev) =>
-        prev.filter((event) => event.id !== selectedEvent.id)
-      );
-      setIsViewOpen(false);
-      setSelectedEvent(null);
+      try {
+        const { initializeDatabase, deleteEvent } = await import(
+          '@/lib/tauriDatabase'
+        );
+        const db = await initializeDatabase();
+        await deleteEvent(db, parseInt(selectedEvent.id));
+
+        setEvents((prev) =>
+          prev.filter((event) => event.id !== selectedEvent.id)
+        );
+        setIsViewOpen(false);
+        setSelectedEvent(null);
+      } catch (error) {
+        console.error('Failed to delete event:', error);
+      }
     }
   }, [selectedEvent]);
+
+  const handleViewNote = useCallback(
+    (noteId: number) => {
+      router.push(`/notes?noteId=${noteId}`);
+    },
+    [router]
+  );
 
   const handleCloseViewDialog = () => {
     setIsViewOpen(false);
@@ -188,8 +306,24 @@ export default function MyCalendar() {
     setSelectedEvent(null);
   };
 
+  // Custom event styles based on whether it's a note event or regular event
+  const eventPropGetter = useCallback((event: CalendarEvent) => {
+    return {
+      className: event.noteId ? 'note-event' : 'regular-event',
+      style: {
+        backgroundColor: event.noteId ? '#3b82f6' : '#10b981', // blue-500 for notes, emerald-500 for regular events
+        borderColor: event.noteId ? '#2563eb' : '#059669', // blue-600 for notes, emerald-600 for regular events
+      },
+    };
+  }, []);
+
   return (
-    <div className="relative p-4">
+    <div className="relative space-y-8 p-4">
+      {/* <div className="mb-8">
+        <h2 className="mb-4 text-2xl font-bold">Note Activity</h2>
+        <NoteHeatmap />
+      </div> */}
+
       {/* Create Event Dialog */}
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
         <DialogContent className="sm:max-w-[425px]">
@@ -297,6 +431,17 @@ export default function MyCalendar() {
                 )}
               </div>
             </div>
+            {selectedEvent?.noteId && (
+              <div className="grid gap-2">
+                <Label>Associated Note</Label>
+                <Button
+                  variant="outline"
+                  onClick={() => handleViewNote(selectedEvent.noteId!)}
+                >
+                  View Note: {selectedEvent.noteName}
+                </Button>
+              </div>
+            )}
           </div>
           <DialogFooter className="flex justify-between sm:justify-between">
             <div className="flex gap-2">
@@ -324,7 +469,7 @@ export default function MyCalendar() {
         </DialogContent>
       </Dialog>
 
-      <ScrollArea className="h-[calc(100vh-4rem)]">
+      <div className="h-[calc(100vh-4rem)]">
         <DnDCalendar
           localizer={localizer}
           events={events}
@@ -332,12 +477,15 @@ export default function MyCalendar() {
           onEventResize={handleEventResize}
           onSelectSlot={handleSelectSlot}
           onSelectEvent={handleSelectEvent}
+          eventPropGetter={eventPropGetter}
           resizable
           selectable
-          defaultView={Views.DAY}
+          defaultView={Views.MONTH}
+          views={[Views.MONTH, Views.WEEK, Views.DAY, Views.AGENDA]}
+          style={{ height: '100%' }}
           className="h-full"
         />
-      </ScrollArea>
+      </div>
     </div>
   );
 }

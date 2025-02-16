@@ -38,11 +38,26 @@ export default function NewNotePage() {
 
     setIsSaving(true);
     try {
-      const { initializeDatabase, addNote } = await import(
+      const { initializeDatabase, addNote, addEvent } = await import(
         '@/lib/tauriDatabase'
       );
       const db = await initializeDatabase();
-      await addNote(db, title, JSON.stringify(value));
+
+      // Add the note
+      const newNote = await addNote(db, title, JSON.stringify(value));
+
+      // Create a calendar event for the note creation
+      const now = new Date();
+      const endTime = new Date(now.getTime() + 30 * 60000); // 30 minutes duration
+      await addEvent(
+        db,
+        `Created Note: ${title}`,
+        'Note creation event',
+        now.toISOString(),
+        endTime.toISOString(),
+        newNote.id
+      );
+
       router.push('/notes');
     } catch (error) {
       console.error('Failed to save note:', error);
