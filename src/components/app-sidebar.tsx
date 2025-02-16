@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { BookOpen, PenSquare, Settings } from 'lucide-react';
+import { BookOpen, Calendar, PenSquare, Settings } from 'lucide-react';
 
 import { Sidebar, SidebarContent, SidebarRail } from '@/components/ui/sidebar';
 import { NavMain } from '@/components/nav-main';
@@ -18,6 +18,12 @@ const data = {
       title: 'New Note',
       url: '/newnote',
       icon: PenSquare,
+      isActive: true,
+    },
+    {
+      title: 'Calendar',
+      url: '/cal',
+      icon: Calendar,
       isActive: true,
     },
   ],

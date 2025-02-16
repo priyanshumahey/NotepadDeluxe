@@ -1,6 +1,6 @@
 /** @type {import('prettier').Config} */
 module.exports = {
-  endOfLine: 'lf',
+  endOfLine: 'auto',
   semi: true,
   singleQuote: true,
   tabWidth: 2,

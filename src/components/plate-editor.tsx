@@ -160,7 +160,7 @@ export default function PlateEditor({
             <FixedToolbarButtons />
           </FixedToolbar>
 
-          <Editor autoFocus focusRing={false} variant="demo" size="md" />
+          <Editor autoFocus focusRing={false} size="md" />
 
           <FloatingToolbar>
             <FloatingToolbarButtons />

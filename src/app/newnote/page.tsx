@@ -52,10 +52,10 @@ export default function NewNotePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       {/* Sticky Navigation Header */}
       <nav className="sticky top-0 z-10 border-b bg-white p-4 shadow-sm">
-        <div className="container mx-auto flex max-w-4xl items-center justify-between">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
@@ -78,7 +78,7 @@ export default function NewNotePage() {
       </nav>
 
       {/* Main Content */}
-      <main className="container mx-auto max-w-4xl p-4">
+      <main className="mx-auto p-4">
         <div className="space-y-4">
           <Input
             value={title}

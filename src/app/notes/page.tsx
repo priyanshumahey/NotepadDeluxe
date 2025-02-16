@@ -134,7 +134,7 @@ function NotesPage() {
   return (
     <div className="min-h-screen">
       <nav className="sticky top-0 z-10 border-b bg-white p-4 shadow-sm">
-        <div className="container mx-auto flex max-w-4xl items-center justify-between">
+        <div className="mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
@@ -167,7 +167,7 @@ function NotesPage() {
         </div>
       </nav>
 
-      <main className="container mx-auto max-w-4xl p-4">
+      <main className="mx-auto p-4">
         {isEditing && selectedNote ? (
           <NoteEditor
             note={selectedNote}
