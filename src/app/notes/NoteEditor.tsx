@@ -108,7 +108,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ note, onSave }) => {
         </Button>
       </div>
 
-      <div className="rounded-lg border bg-white p-4">
+      <div className="rounded-lg bg-white">
         <PlateEditor initialValue={value} setValue={setValue} />
       </div>
     </div>
