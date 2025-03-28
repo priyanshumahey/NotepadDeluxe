@@ -138,13 +138,14 @@ export default function MyCalendar() {
   );
 
   return (
-    <div className="p-4 h-[calc(100vh-4rem)]">
+    <div className="flex flex-col h-[calc(100vh-4rem)] p-4">
       <EventCalendar
         events={events}
         onEventAdd={handleEventAdd}
         onEventUpdate={handleEventUpdate}
         onEventDelete={handleEventDelete}
         onEventSelect={handleEventSelect}
+        className="flex-1 overflow-hidden"
       />
     </div>
   );

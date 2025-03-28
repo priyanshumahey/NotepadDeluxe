@@ -93,8 +93,8 @@ export function MonthView({
   }, [])
 
   return (
-    <>
-      <div className="border-border/70 grid grid-cols-7 border-b">
+    <div className="flex flex-col h-full">
+      <div className="border-border/70 grid grid-cols-7 border-b sticky top-0 z-10 bg-background/80 backdrop-blur-md">
         {weekdays.map((day) => (
           <div
             key={day}
@@ -104,7 +104,7 @@ export function MonthView({
           </div>
         ))}
       </div>
-      <div className="grid flex-1 auto-rows-fr">
+      <div className="grid flex-1 auto-rows-fr overflow-auto">
         {weeks.map((week, weekIndex) => (
           <div
             key={`week-${weekIndex}`}
@@ -265,6 +265,6 @@ export function MonthView({
           </div>
         ))}
       </div>
-    </>
+    </div>
   )
 }

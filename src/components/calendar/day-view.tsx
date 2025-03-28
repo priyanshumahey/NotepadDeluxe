@@ -184,7 +184,14 @@ export function DayView({
   )
 
   return (
-    <>
+    <div className="flex h-full flex-col">
+      {/* Sticky header for day view */}
+      <div className="bg-background/80 border-border/70 sticky top-0 z-30 py-2 text-center border-b backdrop-blur-md">
+        <h3 className="text-base font-medium">
+          {format(currentDate, "EEEE, MMMM d, yyyy")}
+        </h3>
+      </div>
+
       {showAllDaySection && (
         <div className="border-border/70 bg-muted/50 border-t">
           <div className="grid grid-cols-[3rem_1fr] sm:grid-cols-[4rem_1fr]">
@@ -219,7 +226,7 @@ export function DayView({
         </div>
       )}
 
-      <div className="border-border/70 grid flex-1 grid-cols-[3rem_1fr] border-t sm:grid-cols-[4rem_1fr]">
+      <div className="border-border/70 grid flex-1 grid-cols-[3rem_1fr] border-t overflow-auto sm:grid-cols-[4rem_1fr]">
         <div>
           {hours.map((hour, index) => (
             <div
@@ -315,6 +322,6 @@ export function DayView({
           })}
         </div>
       </div>
-    </>
+    </div>
   )
 }
